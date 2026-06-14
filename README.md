@@ -119,7 +119,7 @@ Contribution Roadmap
 
 ## 🌍 Impact
 
-CodeAtlas aims to make open-source contribution accessible to everyone by helping more developers understand, learn, and contribute to real-world software projects.
+CodeAtlas aims to make open-source contributions accessible to everyone by helping more developers understand, learn, and contribute to real-world software projects.
 
 ---
 
