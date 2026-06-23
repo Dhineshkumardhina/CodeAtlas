@@ -1,5 +1,8 @@
 const Repository = require('../models/Repository');
 const analyzerService = require('../services/analyzerService');
+const mongoose = require('mongoose');
+
+const isDatabaseConnected = () => mongoose.connection.readyState === 1;
 
 /**
  * @desc    Analyze repository structure and issues
@@ -15,14 +18,18 @@ const analyzeRepo = async (req, res, next) => {
       return next(new Error('Please provide a repository URL'));
     }
 
-    // 1. Check database for existing analysis cached
-    // Standardize URL to search matching cases (removing trailing slash, lowercase, .git extension)
-    const normalizedUrl = repoUrl.trim().replace(/\.git$/, '').replace(/\/$/, '').toLowerCase();
-    
-    // We search using regex to find case-insensitive matching URL or similar clean path
-    let cachedRepo = await Repository.findOne({ 
-      repoUrl: new RegExp('^' + normalizedUrl.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') 
-    });
+    let cachedRepo = null;
+
+    if (isDatabaseConnected()) {
+      // 1. Check database for existing analysis cached
+      // Standardize URL to search matching cases (removing trailing slash, lowercase, .git extension)
+      const normalizedUrl = repoUrl.trim().replace(/\.git$/, '').replace(/\/$/, '').toLowerCase();
+
+      // We search using regex to find case-insensitive matching URL or similar clean path
+      cachedRepo = await Repository.findOne({
+        repoUrl: new RegExp('^' + normalizedUrl.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
+      });
+    }
 
     if (cachedRepo) {
       console.log(`Serving cached analysis for ${repoUrl}`);
@@ -54,23 +61,25 @@ const analyzeRepo = async (req, res, next) => {
     console.log(`Performing live analysis for ${repoUrl}`);
     const analysis = await analyzerService.analyzeRepository(repoUrl);
 
-    // 3. Save to database cache
-    const newRepo = new Repository({
-      userId: req.user ? req.user.id : null,
-      repoUrl: repoUrl,
-      projectName: analysis.repositoryData.projectName,
-      description: analysis.repositoryData.description,
-      language: analysis.repositoryData.language,
-      stars: analysis.repositoryData.stars,
-      forks: analysis.repositoryData.forks,
-      technologies: analysis.repositoryData.technologies,
-      folders: analysis.repositoryData.folders,
-      importantFiles: analysis.repositoryData.importantFiles,
-      aiSummary: analysis.aiExplanation,
-      roadmap: analysis.roadmap
-    });
+    if (isDatabaseConnected()) {
+      // 3. Save to database cache
+      const newRepo = new Repository({
+        userId: req.user ? req.user.id : null,
+        repoUrl: repoUrl,
+        projectName: analysis.repositoryData.projectName,
+        description: analysis.repositoryData.description,
+        language: analysis.repositoryData.language,
+        stars: analysis.repositoryData.stars,
+        forks: analysis.repositoryData.forks,
+        technologies: analysis.repositoryData.technologies,
+        folders: analysis.repositoryData.folders,
+        importantFiles: analysis.repositoryData.importantFiles,
+        aiSummary: analysis.aiExplanation,
+        roadmap: analysis.roadmap
+      });
 
-    await newRepo.save();
+      await newRepo.save();
+    }
 
     res.status(200).json({
       success: true,

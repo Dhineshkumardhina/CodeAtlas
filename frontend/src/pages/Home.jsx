@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 import FeatureCard from '../components/FeatureCard';
-import { Compass, BookOpen, Layers, Milestone, ArrowRight, Github, Code, Sparkles, Terminal, Activity } from 'lucide-react';
+import { Compass, BookOpen, Layers, Milestone, ArrowRight, Github, Code, Sparkles, Terminal, Activity, Brain} from 'lucide-react';
 import { analyzeRepository } from '../services/api';
 import { useAuth } from '../App';
 

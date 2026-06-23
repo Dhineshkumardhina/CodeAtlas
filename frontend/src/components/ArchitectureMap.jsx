@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Monitor, ArrowRight, Server, Database, Brain, GitBranch, ArrowDown, HelpCircle } from 'lucide-react';
+import { Monitor, ArrowRight, Server, Database, Brain, GitBranch, ArrowDown } from 'lucide-react';
 
 function ArchitectureMap({ language, folders }) {
   const [selectedNode, setSelectedNode] = useState('frontend');
@@ -194,23 +194,108 @@ function ArchitectureMap({ language, folders }) {
           </div>
         </div>
       </div>
+            {/* Repository Complexity */}
+<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+  
+  <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
+    <h4 className="text-sm font-bold text-white">
+      Total Folders
+    </h4>
+    <p className="text-3xl font-bold text-violet-400 mt-2">
+      {folders?.length || 0}
+    </p>
+  </div>
 
+  <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+    <h4 className="text-sm font-bold text-white">
+      Architecture Type
+    </h4>
+    <p className="text-sm font-semibold text-blue-400 mt-2">
+      {folders?.includes('src')
+        ? 'Frontend Application'
+        : folders?.includes('api')
+        ? 'Backend Service'
+        : 'Multi Module Repository'}
+    </p>
+  </div>
+
+  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+    <h4 className="text-sm font-bold text-white">
+      Beginner Friendliness
+    </h4>
+    <p className="text-3xl font-bold text-emerald-400 mt-2">
+      {folders?.length < 10 ? 'High' : 'Medium'}
+    </p>
+  </div>
+
+</div>
       {/* Target Repository Folder Structure Snippet if available */}
-      {folders && folders.length > 0 && (
-        <div className="mt-8 border-t border-white/5 pt-6 text-left">
-          <h4 className="font-display text-sm font-bold text-gray-300 mb-4">Target Repository Folder Structure</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {folders.map((folder, index) => (
-              <div key={index} className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/5 px-3 py-2 text-xs font-medium text-gray-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-                {folder}/
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="mt-8 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+  
+  <h3 className="text-lg font-bold text-white mb-3">
+    Best Contribution Areas
+  </h3>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <div>
+      <div className="text-amber-400 font-bold">
+        ⭐ Documentation
+      </div>
+      <div className="text-xs text-gray-400">
+        Easiest place to start contributing.
+      </div>
     </div>
-  );
+
+    <div>
+      <div className="text-blue-400 font-bold">
+        ⭐ UI Components
+      </div>
+      <div className="text-xs text-gray-400">
+        Good for frontend learners.
+      </div>
+    </div>
+
+    <div>
+      <div className="text-emerald-400 font-bold">
+        ⭐ Bug Fixes
+      </div>
+      <div className="text-xs text-gray-400">
+        Ideal for gaining project familiarity.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+      {folders && folders.length > 0 && (
+  <div className="mt-8 border-t border-white/5 pt-6 text-left">
+    
+    <h4 className="font-display text-sm font-bold text-gray-300 mb-4">
+      Repository Structure Map
+    </h4>
+
+    <div className="rounded-2xl bg-[#0d1220] border border-white/5 p-5 font-mono text-sm">
+      
+      <div className="text-violet-400 mb-2">
+        Repository
+      </div>
+
+      {folders.map((folder, index) => (
+        <div
+          key={index}
+          className="pl-4 text-gray-300 py-1"
+        >
+          ├── {folder}
+        </div>
+      ))}
+
+    </div>
+
+  </div>
+)}
+</div>
+);
 }
 
 export default ArchitectureMap;

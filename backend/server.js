@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -37,7 +38,11 @@ app.use('/api/repository', repositoryRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date() });
+  res.status(200).json({
+    status: 'OK',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'unavailable',
+    timestamp: new Date()
+  });
 });
 
 // Global Error Handler
