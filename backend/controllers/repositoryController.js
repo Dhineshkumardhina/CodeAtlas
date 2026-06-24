@@ -5,6 +5,14 @@ const mongoose = require('mongoose');
 const isDatabaseConnected = () => mongoose.connection.readyState === 1;
 
 /**
+ * Validate repository URL format
+ */
+const isValidRepoUrl = (url) => {
+  const githubRegex = /^https?:\/\/(www\.)?github\.com\/[^\/]+\/[^\/]+/i;
+  return githubRegex.test(url);
+};
+
+/**
  * @desc    Analyze repository structure and issues
  * @route   POST /api/repository/analyze
  * @access  Public (Optional Auth)
@@ -13,9 +21,15 @@ const analyzeRepo = async (req, res, next) => {
   const { repoUrl } = req.body;
 
   try {
+    // Validation
     if (!repoUrl) {
       res.status(400);
       return next(new Error('Please provide a repository URL'));
+    }
+
+    if (!isValidRepoUrl(repoUrl)) {
+      res.status(400);
+      return next(new Error('Invalid GitHub repository URL. Please use format: https://github.com/owner/repo'));
     }
 
     let cachedRepo = null;
@@ -32,7 +46,7 @@ const analyzeRepo = async (req, res, next) => {
     }
 
     if (cachedRepo) {
-      console.log(`Serving cached analysis for ${repoUrl}`);
+      console.log(`✅ Serving cached analysis for ${repoUrl}`);
       
       // If user is logged in, link this repo analysis to their user id if not already linked
       if (req.user && !cachedRepo.userId) {
@@ -42,6 +56,7 @@ const analyzeRepo = async (req, res, next) => {
 
       return res.status(200).json({
         success: true,
+        cached: true,
         repositoryData: {
           projectName: cachedRepo.projectName,
           description: cachedRepo.description,
@@ -58,7 +73,7 @@ const analyzeRepo = async (req, res, next) => {
     }
 
     // 2. Perform analysis via analyzerService
-    console.log(`Performing live analysis for ${repoUrl}`);
+    console.log(`🔍 Performing live analysis for ${repoUrl}`);
     const analysis = await analyzerService.analyzeRepository(repoUrl);
 
     if (isDatabaseConnected()) {
@@ -83,6 +98,7 @@ const analyzeRepo = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      cached: false,
       repositoryData: analysis.repositoryData,
       aiExplanation: analysis.aiExplanation,
       roadmap: analysis.roadmap
@@ -99,8 +115,14 @@ const analyzeRepo = async (req, res, next) => {
  */
 const getHistory = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      res.status(401);
+      return next(new Error('Not authorized'));
+    }
+
     const history = await Repository.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
+      .limit(100)
       .select('projectName repoUrl language stars forks createdAt');
       
     res.status(200).json({
@@ -119,6 +141,11 @@ const getHistory = async (req, res, next) => {
  */
 const deleteHistoryItem = async (req, res, next) => {
   try {
+    if (!req.params.id || !mongoose.Types.ObjectId.isValid(req.params.id)) {
+      res.status(400);
+      return next(new Error('Invalid repository ID'));
+    }
+
     const repo = await Repository.findById(req.params.id);
     if (!repo) {
       res.status(404);
@@ -127,7 +154,7 @@ const deleteHistoryItem = async (req, res, next) => {
 
     // Check ownership
     if (!repo.userId || repo.userId.toString() !== req.user.id.toString()) {
-      res.status(401);
+      res.status(403);
       return next(new Error('Not authorized to delete this analysis'));
     }
 

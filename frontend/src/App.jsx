@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -9,7 +10,13 @@ import { getMe } from './services/api';
 // Create Auth Context
 const AuthContext = createContext(null);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthContext.Provider');
+  }
+  return context;
+};
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,6 +37,7 @@ function App() {
         } catch (error) {
           console.error('Session validation failed:', error.message);
           localStorage.removeItem('token');
+          setUser(null);
         }
       }
       setLoading(false);
@@ -64,21 +72,23 @@ function App() {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, currentAnalysis, setCurrentAnalysis }}>
-      <BrowserRouter>
-        <div className="flex min-h-screen flex-col bg-[#0b0f19]">
-          <Navbar />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
-    </AuthContext.Provider>
+    <ErrorBoundary>
+      <AuthContext.Provider value={{ user, login, logout, currentAnalysis, setCurrentAnalysis }}>
+        <BrowserRouter>
+          <div className="flex min-h-screen flex-col bg-[#0b0f19]">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </main>
+          </div>
+        </BrowserRouter>
+      </AuthContext.Provider>
+    </ErrorBoundary>
   );
 }
 

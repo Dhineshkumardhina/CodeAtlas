@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Ensure JWT_SECRET is set
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set. Please configure it in your .env file.');
+}
+
 const getTokenFromHeader = (authorizationHeader) => {
   if (!authorizationHeader) {
     return null;
@@ -27,7 +33,7 @@ const protect = async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123456');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Get user from the token, excluding password
     req.user = await User.findById(decoded.id).select('-password');
@@ -52,7 +58,7 @@ const optionalAuth = async (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123456');
+      const decoded = jwt.verify(token, JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
     } catch (error) {
       // Just log and continue, we don't block

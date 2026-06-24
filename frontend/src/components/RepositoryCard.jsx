@@ -175,4 +175,5 @@ function RepositoryCard({ data }) {
   );
 }
 
-export default RepositoryCard;
+// Memoize component to prevent unnecessary re-renders
+export default React.memo(RepositoryCard);
