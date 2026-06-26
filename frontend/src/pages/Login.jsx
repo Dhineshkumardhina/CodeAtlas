@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import { registerUser, loginUser } from '../services/api';
-import { Compass, User, Mail, Lock, ShieldAlert, Loader2, Key } from 'lucide-react';
+import { Compass, User, Mail, Lock, ShieldAlert, Loader2 } from 'lucide-react';
 
 function Login() {
   const { user, login } = useAuth();
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams.get('tab');
+    return tab === 'register' ? 'register' : 'login';
+  });
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,13 +28,6 @@ function Login() {
   }, [user, navigate]);
 
   // Handle URL query parameter ?tab=register
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab === 'register' || tab === 'login') {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

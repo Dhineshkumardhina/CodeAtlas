@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import {
   Star,
   GitFork,
@@ -176,4 +176,4 @@ function RepositoryCard({ data }) {
 }
 
 // Memoize component to prevent unnecessary re-renders
-export default React.memo(RepositoryCard);
+export default memo(RepositoryCard);

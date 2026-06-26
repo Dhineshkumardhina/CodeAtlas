@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Monitor, ArrowRight, Server, Database, Brain, GitBranch, ArrowDown } from 'lucide-react';
 
 function ArchitectureMap({ language, folders }) {
@@ -183,7 +183,10 @@ function ArchitectureMap({ language, folders }) {
       <div className="mt-8 rounded-2xl bg-white/3 border border-white/5 p-5 transition-all duration-300">
         <div className="flex items-start gap-4">
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${nodes[selectedNode].color} text-white`}>
-            {React.createElement(nodes[selectedNode].icon, { className: 'h-5 w-5' })}
+            {(() => {
+              const SelectedIcon = nodes[selectedNode].icon;
+              return <SelectedIcon className="h-5 w-5" />;
+            })()}
           </div>
           <div>
             <h4 className="font-display text-base font-bold text-white">{nodes[selectedNode].title}</h4>

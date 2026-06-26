@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 import FeatureCard from '../components/FeatureCard';
-import { Compass, BookOpen, Layers, Milestone, ArrowRight, Github, Code, Sparkles, Terminal, Activity, Brain} from 'lucide-react';
+import { Compass, Layers, Milestone, ArrowRight, Code, Activity, Brain } from 'lucide-react';
 import { analyzeRepository } from '../services/api';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 
 function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,18 +39,19 @@ function Home() {
   ];
 
   useEffect(() => {
-    let interval;
-    if (isLoading) {
-      interval = setInterval(() => {
-        setLoadingStage((prev) => (prev < loadingStages.length - 1 ? prev + 1 : prev));
-      }, 2200);
-    } else {
-      setLoadingStage(0);
+    if (!isLoading) {
+      return undefined;
     }
+
+    const interval = setInterval(() => {
+      setLoadingStage((prev) => (prev < loadingStages.length - 1 ? prev + 1 : prev));
+    }, 2200);
+
     return () => clearInterval(interval);
-  }, [isLoading]);
+  }, [isLoading, loadingStages.length]);
 
   const handleAnalyze = async (repoUrl) => {
+    setLoadingStage(0);
     setIsLoading(true);
     setAnalysisError('');
     try {

@@ -1,4 +1,3 @@
-import React from 'react';
 import RepoInput from './RepoInput';
 import { Sparkles, Terminal, ShieldCheck, Cpu } from 'lucide-react';
 

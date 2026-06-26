@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import { getAnalysisHistory, deleteAnalysisFromHistory, analyzeRepository } from '../services/api';
 import RepositoryCard from '../components/RepositoryCard';
 import ArchitectureMap from '../components/ArchitectureMap';
 import AIResponseCard from '../components/AIResponseCard';
-import { LayoutDashboard, Compass, Trash2, Calendar, Code, ChevronRight, Landmark, ExternalLink, Loader2, Sparkles, MessageCircleCode } from 'lucide-react';
+import { LayoutDashboard, Trash2, Code, Landmark, ExternalLink, Loader2, Sparkles, MessageCircleCode } from 'lucide-react';
 import RepoInput from '../components/RepoInput';
 
 function Dashboard() {
@@ -19,24 +19,27 @@ function Dashboard() {
 
   // Load history if logged in
   useEffect(() => {
-    if (user) {
-      fetchHistory();
+    if (!user) {
+      return undefined;
     }
-  }, [user, currentAnalysis]);
 
-  const fetchHistory = async () => {
-    setLoadingHistory(true);
-    try {
-      const data = await getAnalysisHistory();
-      if (data.success) {
-        setHistory(data.history);
+    const getHistory = async () => {
+      setLoadingHistory(true);
+      try {
+        const data = await getAnalysisHistory();
+        if (data.success) {
+          setHistory(data.history);
+        }
+      } catch (error) {
+        console.error('Failed to fetch history:', error.message);
+      } finally {
+        setLoadingHistory(false);
       }
-    } catch (error) {
-      console.error('Failed to fetch history:', error.message);
-    } finally {
-      setLoadingHistory(false);
-    }
-  };
+    };
+
+    getHistory();
+    return undefined;
+  }, [user, currentAnalysis]);
 
   const handleSelectHistory = async (repoUrl) => {
     setLoadingAnalysis(true);

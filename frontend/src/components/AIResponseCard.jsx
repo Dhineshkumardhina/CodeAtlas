@@ -1,5 +1,4 @@
-import React from 'react';
-import { Brain, MapPin, Compass, PlayCircle, Milestone } from 'lucide-react';
+import { Brain, MapPin, Milestone } from 'lucide-react';
 
 function AIResponseCard({ aiExplanation }) {
   if (!aiExplanation) return null;

@@ -89,7 +89,7 @@ export const registerUser = async (userData) => {
     const response = await API.post('/user/register', userData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Registration failed');
+    throw new Error(error.response?.data?.error || 'Registration failed', { cause: error });
   }
 };
 
@@ -98,7 +98,7 @@ export const loginUser = async (credentials) => {
     const response = await API.post('/user/login', credentials);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Login failed');
+    throw new Error(error.response?.data?.error || 'Login failed', { cause: error });
   }
 };
 
@@ -107,7 +107,7 @@ export const getMe = async () => {
     const response = await API.get('/user/me');
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to fetch user profile');
+    throw new Error(error.response?.data?.error || 'Failed to fetch user profile', { cause: error });
   }
 };
 
@@ -122,7 +122,7 @@ export const analyzeRepository = async (repoUrl) => {
     return response.data;
   } catch (error) {
     const message = error.response?.data?.error || error.message || 'Repository analysis failed';
-    throw new Error(message);
+    throw new Error(message, { cause: error });
   }
 };
 
@@ -131,7 +131,7 @@ export const getAnalysisHistory = async () => {
     const response = await API.get('/repository/history');
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to fetch analysis history');
+    throw new Error(error.response?.data?.error || 'Failed to fetch analysis history', { cause: error });
   }
 };
 
@@ -143,7 +143,7 @@ export const deleteAnalysisFromHistory = async (id) => {
     requestCache.delete('/repository/history');
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to delete analysis');
+    throw new Error(error.response?.data?.error || 'Failed to delete analysis', { cause: error });
   }
 };
 
@@ -155,7 +155,7 @@ export const checkServerHealth = async () => {
     });
     return response.data;
   } catch (error) {
-    throw new Error('Server is not responding');
+    throw new Error('Server is not responding', { cause: error });
   }
 };
 

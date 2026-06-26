@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, Loader2, AlertCircle } from 'lucide-react';
 
 function RepoInput({ onAnalyze, isLoading }) {
@@ -7,7 +7,7 @@ function RepoInput({ onAnalyze, isLoading }) {
 
   const validateUrl = (inputUrl) => {
     if (!inputUrl) return 'Please enter a GitHub repository URL';
-    const regex = /github\.com\/([^\/]+)\/([^\/]+)/i;
+    const regex = /github\.com\/([^/]+)\/([^/]+)/i;
     if (!regex.test(inputUrl)) {
       return 'Invalid URL. Please use: https://github.com/owner/repo';
     }

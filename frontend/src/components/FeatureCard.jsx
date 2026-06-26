@@ -1,5 +1,3 @@
-import React from 'react';
-
 function FeatureCard({ Icon, title, description, badge }) {
   return (
     <div className="glass-panel glass-panel-hover group relative overflow-hidden rounded-2xl p-8 text-left">
