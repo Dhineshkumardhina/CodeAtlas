@@ -17,9 +17,7 @@ Many aspiring developers want to contribute to open-source but struggle because 
 - Difficulty understanding unfamiliar codebases
 - Finding suitable contribution opportunities
 
-This creates a barrier between new developers and the open-source community.
 
----
 
 ## 💡 Solution
 
